@@ -16,11 +16,18 @@ const timelineData = [
     title: "2024",
     content: (
       <div className="text-neutral-300">
-        <p className="text-sm md:text-base">
+                                                          <p className="text-sm md:text-base">
           Launched The Technical Society with a vision to bring together the brightest minds in technology. 
           Started with our first cohort of engineers and designers.
         </p>
-      </div>
+
+
+
+
+
+
+
+                     </div>
     ),
   },
   {
@@ -61,14 +68,32 @@ const timelineData = [
 export default function Home() {
   return (
     <div className="w-[90%] mx-auto">
-      <div className="min-h-screen bg-black text-foreground">
+
+
+                        <div className="min-h-screen bg-black text-foreground">
         <Navigation />
         
         {/* Hero Section */}
         <HeroSection />
 
         {/* About Section */}
-        <div className="bg-black">
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                           <div className="bg-black">
+
+
+
+
+
+
+
+
+
+
           <About />
         </div>
 
