@@ -1,5 +1,9 @@
 name: Node.js CI Checks
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   pull_request:
     branches: [ main ] # Or your default branch
@@ -9,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      status: ${{ job.status }} # Output the final status
+      status: ${{ job.status }}
     strategy:
       matrix:
         node-version: [18.x] 
@@ -36,7 +40,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     outputs:
-      status: ${{ job.status }} # Output the final status
+      status: ${{ job.status }}
     strategy:
       matrix:
         node-version: [18.x] 
@@ -63,30 +67,20 @@ jobs:
   generate-comment:
     name: Generate PR Comment
     runs-on: ubuntu-latest
-    # This job needs 'build' and 'lint' to finish first
     needs: [build, lint]
-    # 'if: always()' ensures this job runs even if 'build' or 'lint' fail
-    if: always() 
-    
-    # Give the job permissions to write comments on PRs
+    if: always()
     permissions:
-      pull-requests: write 
+      pull-requests: write
 
     steps:
-      # The 'Get PR Number' step is removed, as we can access the number directly.
-        
       - name: Generate comment content
-        id: generate-content # Give this step an ID to reference its outputs
+        id: generate-content
         env:
-          # Get the 'success' or 'failure' status from the previous jobs
           CI_STATUS: ${{ needs.build.outputs.status }}
           LINT_STATUS: ${{ needs.lint.outputs.status }}
         run: |
-          # Generate a temporary file for the comment
           COMMENT_FILE=$(mktemp)
 
-          # --- This is the logic from your image ---
-          # We check the job statuses from the 'env' above
           if [ "$CI_STATUS" == "success" ] && [ "$LINT_STATUS" == "success" ]; then
             echo "## ✅ All Checks Passed!" >> $COMMENT_FILE
             echo "" >> $COMMENT_FILE
@@ -110,21 +104,19 @@ jobs:
             echo "Please fix the following issues before merging:" >> $COMMENT_FILE
             echo "" >> $COMMENT_FILE
 
-            # Check for Build failure
             if [ "$CI_STATUS" == "failure" ]; then
               echo "### 🔴 Continuous Integration Failed" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
               echo "**Issue:** The build process failed to complete." >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
               echo "**How to fix:**" >> $COMMENT_FILE
-              echo "1. Run \`npm run build\` locally to identify the issue" >> $COMMENT_FILE
+              echo "1. Run \`npm run build\` locally" >> $COMMENT_FILE
               echo "2. Fix any TypeScript compilation errors" >> $COMMENT_FILE
-              echo "3. Ensure all dependencies are properly installed" >> $COMMENT_FILE
-              echo "4. Test your changes before pushing" >> $COMMENT_FILE
+              echo "3. Ensure all dependencies are installed" >> $COMMENT_FILE
+              echo "4. Test changes before pushing" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
             fi
 
-            # Check for Lint failure
             if [ "$LINT_STATUS" == "failure" ]; then
               echo "### 🔴 Code Linting Failed" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
@@ -132,15 +124,12 @@ jobs:
               echo "" >> $COMMENT_FILE
               echo "**How to fix:**" >> $COMMENT_FILE
               echo "1. Run \`npm run lint\` or \`npm run format\` locally" >> $COMMENT_FILE
-              echo "2. Fix all the reported linting errors" >> $COMMENT_FILE
-              echo "3. Test your changes before pushing" >> $COMMENT_FILE
+              echo "2. Fix all reported linting errors" >> $COMMENT_FILE
+              echo "3. Test changes before pushing" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
             fi
           fi
-          # --- End of image logic ---
 
-          # This line reads the content of the file and sets it as an output for this step
-          # The 'EOF' markers help handle the multi-line text
           echo "comment-body<<EOF" >> $GITHUB_OUTPUT
           cat $COMMENT_FILE >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -148,10 +137,6 @@ jobs:
       - name: Post or Update PR Comment
         uses: peter-evans/create-or-update-comment@v4
         with:
-          # Use the PR number directly from the GitHub event context
           issue-number: ${{ github.event.pull_request.number }}
-          # Use the 'comment-body' output from the 'generate-content' step
           body: ${{ steps.generate-content.outputs.comment-body }}
-          # This makes the action find and edit its *own* last comment
-          # instead of posting a new one every time
           edit-mode: replace
