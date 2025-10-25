@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, Eye, Code, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/sections/Navigation";
 import Footer from "@/sections/Footer";
+import { useRouter } from "next/navigation";
 
 const BlogWritePage = () => {
-const [markdown, setMarkdown] = useState<string>(`#Your Blog Title
+  const router = useRouter();
+
+  const [markdown, setMarkdown] = useState<string>(`#Your Blog Title
 
 Paste your blog content here. You can include:
 
@@ -32,64 +35,91 @@ Add more content here. Images, links, and code blocks will render nicely.
   const [author, setAuthor] = useState("");
   const [tags, setTags] = useState("");
 
-const parseMarkdown = (text: string) => {
-  let html = text;
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("blog_draft");
+    if (savedDraft) {
+      const { title, author, tags, markdown } = JSON.parse(savedDraft);
+      setTitle(title);
+      setAuthor(author);
+      setTags(tags);
+      setMarkdown(markdown);
+    }
+  }, []);
 
-  html = html.replace(
-    /```(\w+)?\n([\s\S]*?)```/g,
-    (_match, _lang, code) =>
-      `<pre><code class="bg-[#1C1C21] text-gray-300 p-4 rounded-lg overflow-x-auto font-mono text-sm my-4 block">${(code || "")
-        .trim()
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")}</code></pre>`
-  );
+  const parseMarkdown = (text: string) => {
+    let html = text;
 
-  html = html.replace(
-    /!\[([^\]]*)\]\(([^)]+)\)/g,
-    '<img src="$2" alt="$1" class="rounded-xl w-full max-w-full max-h-[500px] object-contain border border-white/10 shadow-md my-6" />'
-  );
+    html = html.replace(
+      /```(\w+)?\n([\s\S]*?)```/g,
+      (_match, _lang, code) =>
+        `<pre><code class="bg-[#1C1C21] text-gray-300 p-4 rounded-lg overflow-x-auto font-mono text-sm my-4 block">${(code || "")
+          .trim()
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")}</code></pre>`
+    );
 
-  html = html.replace(
-    /`([^`]+)`/g,
-    '<code class="bg-[#1C1C21] text-primary px-2 py-1 rounded text-sm">$1</code>'
-  );
+    html = html.replace(
+      /!\[([^\]]*)\]\(([^)]+)\)/g,
+      '<img src="$2" alt="$1" class="rounded-xl w-full max-w-full max-h-[500px] object-contain border border-white/10 shadow-md my-6" />'
+    );
 
-  html = html.replace(/^###\s*(.*)$/gim, '<h3 class="text-2xl font-semibold text-white mb-2 mt-4">$1</h3>');
-  html = html.replace(/^##\s*(.*)$/gim, '<h2 class="text-3xl font-bold text-white mb-3 mt-6">$1</h2>');
-  html = html.replace(/^#\s*(.*)$/gim, '<h1 class="text-4xl font-bold text-white mb-4 mt-8 first:mt-0">$1</h1>');
+    html = html.replace(
+      /`([^`]+)`/g,
+      '<code class="bg-[#1C1C21] text-primary px-2 py-1 rounded text-sm">$1</code>'
+    );
 
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
-  html = html.replace(/\*([^*]+)\*/g, '<em class="italic text-gray-200">$1</em>');
+    html = html.replace(/^###\s*(.*)$/gim, '<h3 class="text-2xl font-semibold text-white mb-2 mt-4">$1</h3>');
+    html = html.replace(/^##\s*(.*)$/gim, '<h2 class="text-3xl font-bold text-white mb-3 mt-6">$1</h2>');
+    html = html.replace(/^#\s*(.*)$/gim, '<h1 class="text-4xl font-bold text-white mb-4 mt-8 first:mt-0">$1</h1>');
 
-  html = html.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="text-primary hover:text-green-400 underline transition-colors" target="_blank" rel="noopener noreferrer">$1</a>'
-  );
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+    html = html.replace(/\*([^*]+)\*/g, '<em class="italic text-gray-200">$1</em>');
 
-  html = html
-    .split("\n")
-    .map((line) => {
-      if (!line.trim()) return "";
-      if (line.startsWith("<")) return `<div class="my-6">${line}</div>`;
-      return `<p class="text-gray-300 mb-4 leading-relaxed">${line}</p>`;
-    })
-    .join("\n");
+    html = html.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      '<a href="$2" class="text-primary hover:text-green-400 underline transition-colors" target="_blank" rel="noopener noreferrer">$1</a>'
+    );
 
-  return html;
-};
+    html = html
+      .split("\n")
+      .map((line) => {
+        if (!line.trim()) return "";
+        if (line.startsWith("<")) return `<div class="my-6">${line}</div>`;
+        return `<p class="text-gray-300 mb-4 leading-relaxed">${line}</p>`;
+      })
+      .join("\n");
+
+    return html;
+  };
 
   const MarkdownPreview = ({ content }: { content: string }) => (
     <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }} />
   );
 
-  const handlePublish = () => {
-    console.log({ title, author, tags, content: markdown });
-    alert("Blog published successfully!");
+  const handleSaveDraft = () => {
+    const draft = { title, author, tags, markdown };
+    localStorage.setItem("blog_draft", JSON.stringify(draft));
+    alert("📝 Draft saved locally!");
   };
 
-  const handleSaveDraft = () => {
-    console.log("Draft saved");
-    alert("Draft saved!");
+  const handlePublish = () => {
+    const newBlog = {
+      id: Date.now(),
+      title,
+      author,
+      tags: tags.split(",").map((t) => t.trim()),
+      content: markdown,
+      date: new Date().toLocaleString(),
+    };
+
+    const existingBlogs = JSON.parse(localStorage.getItem("published_blogs") || "[]");
+    existingBlogs.push(newBlog);
+    localStorage.setItem("published_blogs", JSON.stringify(existingBlogs));
+
+    localStorage.removeItem("blog_draft");
+
+    alert("✅ Blog published successfully!");
+    router.push("/blogs");
   };
 
   return (
