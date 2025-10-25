@@ -5,8 +5,8 @@ permissions:
   pull-requests: write
 
 on:
-  pull_request:
-    branches: [ main ] # Or your default branch
+  pull_request_target:
+    branches: [ main ] 
 
 jobs:
   # Job 1: Run the build
@@ -16,7 +16,7 @@ jobs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        node-version: [18.x] 
+        node-version: [18.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        node-version: [18.x] 
+        node-version: [18.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
