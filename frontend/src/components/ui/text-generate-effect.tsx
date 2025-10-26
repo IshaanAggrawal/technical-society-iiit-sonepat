@@ -18,7 +18,7 @@ export const TextGenerateEffect = ({
   useEffect(() => {
     const controls = animate(count, words.length, {
       type: "tween",
-      duration: 2.5, // Increased from 1 to 2.5 seconds
+      duration: 2.5,
       ease: "easeInOut",
     });
     return controls.stop;

@@ -187,6 +187,14 @@ const Navigation = () => {
               </NavigationMenuList>
             </NavigationMenu>
             <Button 
+              onClick={() => window.open('/roadmaps', '_blank')}
+              size="sm"
+              variant="outline"
+              className="text-sm text-muted-foreground hover:text-foreground transition-all duration-300 bg-transparent hover:bg-white/5 border-white/20"
+            >
+              Roadmaps
+            </Button>
+            <Button 
               onClick={() => scrollToSection('cta')}
               size="sm"
               className="button-gradient"
@@ -253,9 +261,19 @@ const Navigation = () => {
                   <Button 
                     onClick={() => {
                       setIsMobileMenuOpen(false);
+                      window.open('/roadmaps', '_blank');
+                    }}
+                    variant="outline"
+                    className="mt-4 text-muted-foreground hover:text-foreground bg-transparent hover:bg-white/5 border-white/20"
+                  >
+                    Roadmaps
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
                       scrollToSection('cta');
                     }}
-                    className="button-gradient mt-4"
+                    className="button-gradient mt-2"
                   >
                     Explore
                   </Button>

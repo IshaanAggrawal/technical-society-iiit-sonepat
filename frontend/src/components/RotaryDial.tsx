@@ -32,7 +32,6 @@ const RotaryDial = () => {
     setRotation(0);
   };
 
-  // Touch handlers: no more preventDefault()
   const handleTouchStart = (e: React.TouchEvent) => {
     isDragging.current = true;
     startY.current = e.touches[0].clientY;

@@ -14,7 +14,7 @@ const TypingWords = () => {
       const waitTimer = setTimeout(() => {
         setIsWaiting(false);
         setIsDeleting(true);
-      }, 2000); // pause 2s after word completes
+      }, 2000);
       return () => clearTimeout(waitTimer);
     }
 
@@ -23,7 +23,7 @@ const TypingWords = () => {
         if (currentText.length < currentWord.length) {
           setCurrentText(currentWord.substring(0, currentText.length + 1));
         } else {
-          setIsWaiting(true); // done typing
+          setIsWaiting(true);
         }
       } else {
         if (currentText.length > 0) {
@@ -33,7 +33,7 @@ const TypingWords = () => {
           setCurrentWordIndex((prev) => (prev + 1) % words.length);
         }
       }
-    }, isDeleting ? 50 : 100); // faster delete
+    }, isDeleting ? 50 : 100);
 
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, isWaiting, currentWordIndex, words]);

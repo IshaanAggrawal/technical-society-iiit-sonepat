@@ -16,18 +16,11 @@ const timelineData = [
     title: "2024",
     content: (
       <div className="text-neutral-300">
-                                                          <p className="text-sm md:text-base">
+        <p className="text-sm md:text-base">
           Launched The Technical Society with a vision to bring together the brightest minds in technology. 
           Started with our first cohort of engineers and designers.
         </p>
-
-
-
-
-
-
-
-                     </div>
+      </div>
     ),
   },
   {
@@ -67,75 +60,62 @@ const timelineData = [
 
 export default function Home() {
   return (
-    <div className="w-[90%] mx-auto">
+    <div style={{ width: '100vw', minHeight: '100vh' }} className="bg-black text-foreground">
+      <Navigation />
+      
+      <HeroSection />
 
+      <div className="bg-black" style={{ width: '100vw' }}>
+        <About />
+      </div>
 
-                        <div className="min-h-screen bg-black text-foreground">
-        <Navigation />
-        
-        {/* Hero Section */}
-        <HeroSection />
-
-        {/* About Section */}
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                           <div className="bg-black">
-
-
-
-
-
-
-
-
-
-
-          <About />
-        </div>
-
-        {/* Gsap Text Section */}
+      <div style={{ 
+        width: '100vw', 
+        position: 'relative',
+        backgroundColor: 'black',
+        paddingTop: '5rem',
+        paddingBottom: '5rem',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw'
+      }}>
         <ScrollReveal
           baseOpacity={0}
           enableBlur={true}
           baseRotation={6}
           blurStrength={30}
+          containerClassName="scroll-reveal-container"
+          textClassName="scroll-reveal-text"
         >
           When does real learning begin? Not in classrooms. It begins when ideas collide, code breaks, and minds rebuild stronger.
 Welcome to The Technical Society — where the brightest engineers, designers, and innovators craft the future, one experiment at a time.
 Here, curiosity isn&apos;t a hobby — it&apos;s a lifestyle. Build. Break. Create. Repeat.
         </ScrollReveal>
+      </div>
 
-        {/* Logo Carousel */}
+      <div style={{ width: '100vw' }}>
         <LogoCarousel />
+      </div>
 
-        {/* Features Section */}
-        <div id="features" className="bg-black">
-          <FeaturesSection />
-        </div>
+      <div id="features" className="bg-black" style={{ width: '100vw' }}>
+        <FeaturesSection />
+      </div>
 
-        {/* Timeline Section */}
-        <div id="timeline" className="bg-black">
-          <Timeline data={timelineData} />
-        </div>
+      <div id="timeline" className="bg-black" style={{ width: '100vw' }}>
+        <Timeline data={timelineData} />
+      </div>
 
-        {/* Testimonials Section */}
-        <div className="bg-black">
-          <TestimonialsSection />
-        </div>
+      <div className="bg-black" style={{ width: '100vw' }}>
+        <TestimonialsSection />
+      </div>
 
-        {/* New CallToAction Section */}
-        <div className="bg-black">
-          <CallToAction />
-        </div>
+      <div className="bg-black" style={{ width: '100vw' }}>
+        <CallToAction />
+      </div>
 
-        {/* Footer */}
-        <div className="bg-black">
-          <Footer />
-        </div>
+      <div className="bg-black" style={{ width: '100vw' }}>
+        <Footer />
       </div>
     </div>
   );

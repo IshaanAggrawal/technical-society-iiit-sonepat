@@ -6,7 +6,6 @@ import { features } from "@/config/features";
 export const FeaturesSection = () => {
   return (
     <section className="container px-4 py-24">
-      {/* Header Section */}
       <div className="max-w-2xl mb-20">
         <h2 className="text-5xl md:text-6xl font-normal mb-6 tracking-tight text-left">
           Empowering Innovation
@@ -20,7 +19,6 @@ export const FeaturesSection = () => {
 
       <Tabs defaultValue={features[0].title} className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-          {/* Left side - Tab triggers */}
           <div className="md:col-span-5 space-y-3">
             <TabsList className="flex flex-col w-full bg-transparent h-auto p-0 space-y-3">
               {features.map((feature) => (
@@ -40,7 +38,6 @@ export const FeaturesSection = () => {
             </TabsList>
           </div>
 
-          {/* Right side - Tab content with images */}
           <div className="md:col-span-7">
             {features.map((feature) => (
               <TabsContent

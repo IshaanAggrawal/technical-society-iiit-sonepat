@@ -37,6 +37,8 @@ const MetafoxGame: React.FC<MetafoxGameProps> = () => {
 
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    const mountElement = mountRef.current;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -60,7 +62,7 @@ const MetafoxGame: React.FC<MetafoxGameProps> = () => {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mountRef.current.appendChild(renderer.domElement);
+    mountElement.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // Load Fox model
@@ -232,7 +234,6 @@ const MetafoxGame: React.FC<MetafoxGameProps> = () => {
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
-      const mountElement = mountRef.current;
       if (mountElement && renderer.domElement) {
         mountElement.removeChild(renderer.domElement);
       }
