@@ -3,67 +3,60 @@ name: Node.js CI Checks
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 on:
   pull_request:
-    branches: [ main ] # Or your default branch
+    branches: [ main ]
+  workflow_dispatch:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  # Job 1: Run the build
   build:
+    name: Build Frontend
     runs-on: ubuntu-latest
     outputs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        node-version: [18.x] 
+        node-version: [18.x]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
+      - run: npm ci
         working-directory: ./frontend
-        run: npm ci
-
-      - name: Run build command
+      - run: npm run build
         working-directory: ./frontend
-        run: npm run build 
 
-  # Job 2: Run the linter
   lint:
+    name: Lint Code
     runs-on: ubuntu-latest
     outputs:
       status: ${{ job.status }}
     strategy:
       matrix:
-        node-version: [18.x] 
+        node-version: [18.x]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
+      - run: npm ci
         working-directory: ./frontend
-        run: npm ci
-
-      - name: Run lint command
+      - run: npm run lint
         working-directory: ./frontend
-        run: npm run lint
 
-  # Job 3: Generate and post the comment
   generate-comment:
     name: Generate PR Comment
     runs-on: ubuntu-latest
@@ -71,16 +64,14 @@ jobs:
     if: always()
     permissions:
       pull-requests: write
-
+      issues: write
     steps:
-      - name: Generate comment content
-        id: generate-content
+      - id: generate-content
         env:
           CI_STATUS: ${{ needs.build.outputs.status }}
           LINT_STATUS: ${{ needs.lint.outputs.status }}
         run: |
           COMMENT_FILE=$(mktemp)
-
           if [ "$CI_STATUS" == "success" ] && [ "$LINT_STATUS" == "success" ]; then
             echo "## ✅ All Checks Passed!" >> $COMMENT_FILE
             echo "" >> $COMMENT_FILE
@@ -103,7 +94,6 @@ jobs:
             echo "" >> $COMMENT_FILE
             echo "Please fix the following issues before merging:" >> $COMMENT_FILE
             echo "" >> $COMMENT_FILE
-
             if [ "$CI_STATUS" == "failure" ]; then
               echo "### 🔴 Continuous Integration Failed" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
@@ -116,7 +106,6 @@ jobs:
               echo "4. Test changes before pushing" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
             fi
-
             if [ "$LINT_STATUS" == "failure" ]; then
               echo "### 🔴 Code Linting Failed" >> $COMMENT_FILE
               echo "" >> $COMMENT_FILE
@@ -129,14 +118,13 @@ jobs:
               echo "" >> $COMMENT_FILE
             fi
           fi
-
           echo "comment-body<<EOF" >> $GITHUB_OUTPUT
           cat $COMMENT_FILE >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Post or Update PR Comment
-        uses: peter-evans/create-or-update-comment@v4
+      - uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.generate-content.outputs.comment-body }}
           edit-mode: replace
+          token: ${{ secrets.COMMENT_TOKEN || github.token }}
