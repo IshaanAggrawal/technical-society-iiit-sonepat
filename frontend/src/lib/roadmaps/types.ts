@@ -10,6 +10,9 @@ export interface CustomNodeData {
   label: string;
   color?: string;
   borderColor?: string;
+  description?: string;
+  duration?: string;
+  level?: string;
 }
 
 export interface RoadmapData {
